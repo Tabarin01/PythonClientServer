@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <form method="POST" action="uploader" enctype="multipart/form-data" id="upload">
+        <!-- <input type="file" id="file" name="file" accept="image/*"> -->
+        <!-- <input multiple type="file" id="file" name="file" accept="image/*"> -->
+        <input multiple type="file" id="file" name="file">
+        <button>Invia</button>
+    </form>
+
+    <script>
+        file.addEventListener("change", () => {
+            console.log(file.files[0]);
+        })
+    </script>
+
+</body>
+
+</html>

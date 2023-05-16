@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        function salva() {
+            stringaJSON = JSON.stringify(carrello);
+            localStorage.setItem("carrello", stringaJSON);
+        }
+
+        function carica() {
+            stringaJSON = localStorage.getItem("carrello");
+            oggetto = JSON.parse(stringaJSON);
+            if (oggetto)
+                carrello = oggetto;
+            stampa()
+        }
+
+        function paga() {
+            postData("/paga", carrello);
+        }
+
+        async function postData(url = "", data = {}) {
+            const response = await fetch(url, {
+                method: "POST",
+                mode: "cors",
+                cache: "no-cache",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
+                body: JSON.stringify(data),
+            });
+            return response.json();
+        }
+    </script>
+</head>
+
+<body>
+
+    <form onsubmit="addProduct()">
+        <input type="text" id="prodottoTXT">
+        <button id="aggiungiBTN">Aggiungi</button>
+    </form>
+
+    <ul id="carrelloUL">
+        <!-- <li>prodotto</li> -->
+    </ul>
+
+    <button onclick="salva()">Salva</button>
+    <button onclick="carica()">Carica</button>
+    <button onclick="paga()">Paga</button>
+
+    <div class="blur"></div>
+    <script>
+        //carica();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        async function sendData(event) {
+            event.preventDefault();
+
+            let n1 = document.getElementById("numero1").value;
+            let n2 = numero2.value;
+            let op = operazione.value;
+
+            await fetch("/calcolatriceAPI", {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify({ // la chiave può essere stringa o anche senza apici
+                        "numero1": n1,
+                        numero2: n2,
+                        operazione: op
+                    })
+                })
+                .then(data => data.json())
+                .then(data => {
+                    //risultato.innerHTML = data + "<i>ciao</i>"
+                    //risultato.textContent = data + "<i>ciao</i>"
+                    risultato.textContent = data
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- onsubmit può creare difficioltà qualora si vuole disambiguare l'operazione da svolgere -->
+    <form onsubmit="sendData(event)">
+        <input type="number" name="numero1" id="numero1">
+        <input type="number" name="numero2" id="numero2">
+        <input type="hidden" id="operazione">
+        <button onclick="operazione.value = '+'">+</button>
+        <button onclick="operazione.value = '-'">-</button>
+        <button onclick="operazione.value = '*'">*</button>
+        <button onclick="operazione.value = '/'">/</button>
+        <button onclick="operazione.value = 'power'">power</button>
+        <button onclick="operazione.value = 'root'">root</button>
+    </form>
+    <h1 id="risultato"></h1>
+
+</body>
+
+</html>
