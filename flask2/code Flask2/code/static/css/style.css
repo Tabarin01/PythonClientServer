@@ -1,0 +1,66 @@
+html,
+body {
+    background-color: aquamarine;
+    margin: 0;
+    padding: 10px 50px;
+}
+
+input#prodottoTXT {
+    /* display: block;
+    position: relative;
+    margin: auto; */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#aggiungiBTN,
+form>button {
+    padding: 5px 10px;
+    font-family: monospace;
+    cursor: pointer;
+    border: none;
+    background-color: hsl(200, 100%, 50%);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px hsla(0, 0%, 0%, 20%);
+    transition: all 1.0s ease;
+}
+
+#aggiungiBTN:hover {
+    background-color: hsl(100, 100%, 60%);
+    color: black;
+    box-shadow: 0 1px 2px hsla(0, 0%, 0%, 20%);
+}
+
+.blur {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent;
+    backdrop-filter: blur(20px);
+    display: none;
+}
+
+@keyframes fadeIn {
+    0% {
+        translate: -200px 0px;
+    }
+    80% {
+        translate: 50px 0px;
+    }
+    100% {
+        translate: 0px 0px;
+    }
+}
+
+li {
+    /* translate: -200px 0px; */
+    animation: fadeIn 1.0s ease;
+}

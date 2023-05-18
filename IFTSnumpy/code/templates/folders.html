@@ -1,66 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
     <script>
-        async function postData(url = "", data = {}) {
-            // Default options are marked with *
-            const response = await fetch(url, {
-                method: "POST", // *GET, POST, PUT, DELETE, etc.
-                mode: "cors", // no-cors, *cors, same-origin
-                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: "same-origin", // include, *same-origin, omit
-                headers: {
-                    "Content-Type": "application/json",
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                redirect: "follow", // manual, *follow, error
-                referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                body: JSON.stringify(data), // body data type must match "Content-Type" header
-            });
-            return response.json(); // parses JSON response into native JavaScript objects
-        }
-    </script>
-</head>
+      var cartellaCorrente;
+      var cartellePassate = [];
 
-<body>
+      async function postData(url = "", data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          redirect: "follow", // manual, *follow, error
+          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+          body: JSON.stringify(data), // body data type must match "Content-Type" header
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+      }
+
+      async function postFile(url = "", data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          // headers: {
+          //     "Content-Type": "multipart/form-data" //"application/json",
+          //         // 'Content-Type': 'application/x-www-form-urlencoded',
+          // },
+          redirect: "follow", // manual, *follow, error
+          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+          body: data, // body data type must match "Content-Type" header
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+      }
+
+      function readFolder(folder) {
+        postData("/read_folder", {
+          folder: `${folder}`, // la chiedo senza slash
+        }).then((data) => {
+          disegna(data);
+          cartellaCorrente = folder;
+
+          if (
+            cartellePassate.length == 0 ||
+            cartellePassate[cartellePassate.length - 1] != cartellaCorrente
+          )
+            cartellePassate.push(cartellaCorrente);
+        });
+      }
+
+      function paginaPrecedente() {
+        if (cartellePassate.length > 1) {
+          cartellePassate.pop();
+          readFolder(cartellePassate[cartellePassate.length - 1]);
+        }
+      }
+
+      function disegna(data) {
+        if (data["success"] == true) {
+          folders.innerHTML = "";
+          files.innerHTML = "";
+          for (let f of data["folders"])
+            folders.innerHTML += /*html*/ `
+                        <li>
+                            ${f}
+                            <button onclick="readFolder('${f}/')">Apri Cartella</button>
+                        </li>`;
+          for (let f of data["files"])
+            files.innerHTML += /*html*/ `
+                        <li>
+                            ${f}
+                            <button onclick="window.open('/get_file/${f}', '_blank').focus()">Apri File</button>
+                        </li>`;
+        }
+      }
+
+      function creaCartella() {
+        event.preventDefault();
+
+        let newFolder = newFolderTXT.value;
+        newFolder = `${cartellaCorrente}${newFolder}`;
+
+        postData(`/create_folder/${newFolder}`).then((data) => {
+          readFolder(cartellaCorrente);
+        });
+      }
+
+      function caricaFile() {
+        event.preventDefault();
+
+        const formData = new FormData();
+        const files = file.files;
+        for (let i = 0; i < files.length; i++) {
+          formData.append("file", files[i]);
+          console.log(files[i]);
+        }
+        //formData.append("file", files);
+        console.log(formData);
+
+        postFile(`/uploader/${cartellaCorrente}`, formData).then((data) => {
+          readFolder(cartellaCorrente);
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <button onclick="paginaPrecedente()">Back</button>
 
     <ul id="folders"></ul>
     <ul id="files"></ul>
 
+    <form onsubmit="creaCartella()">
+      <input type="text" id="newFolderTXT" />
+      <button>Crea Cartella</button>
+    </form>
+
+    <!-- <form method="POST" action="/uploader" enctype="multipart/form-data" id="upload"> -->
+    <form onsubmit="caricaFile()">
+      <input multiple type="file" id="file" name="file" />
+      <!-- <input type="file" id="file" name="file"> -->
+      <button>Invia</button>
+    </form>
 
     <script>
-        function readFolder(folder) {
-            postData("/read_folder", {
-                "folder": `${folder}` // la chiedo senza slash
-            }).then((data) => {
-                disegna(data)
-            })
-        }
-
-        function disegna(data) {
-            if (data["success"] == true) {
-                for (let f of data["folders"])
-                    folders.innerHTML += /*html*/ `
-                        <li>
-                            ${f}
-                            <button onclick="readFolder('${f}')">Apri Cartella</button>
-                        </li>`
-                for (let f of data["files"])
-                    files.innerHTML += /*html*/ `
-                        <li>
-                            ${f}
-                            <button onclick="window.open('/get_file/${f}', '_blank').focus()">Apri File</button>
-                        </li>`
-            }
-        }
+      readFolder("");
     </script>
-
-</body>
-
+  </body>
 </html>
